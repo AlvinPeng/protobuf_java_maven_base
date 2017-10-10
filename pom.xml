@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ptest</groupId>
+    <artifactId>protobuftest</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <!--protobuf与protoc要用同一版本-->
+        <protobuf.version>3.3.1</protobuf.version>
+
+        <proto.files.path>${project.basedir}/src/main/resources/proto</proto.files.path>
+        <generated.files.path>${project.basedir}/src/main/java/generated</generated.files.path>
+        <maven.antrun.plugin.version>1.8</maven.antrun.plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--调用protoc生成代码，需要先安装protoc程序，自动生成的代码会覆盖之前已生成的文件-->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${maven.antrun.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile-protoc</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <tasks>
+                                <mkdir dir="${generated.files.path}"/>
+                                <path id="proto.path">
+                                    <fileset dir="${proto.files.path}">
+                                        <include name="**/*.proto"/>
+                                    </fileset>
+                                </path>
+                                <pathconvert pathsep=" " property="proto.files" refid="proto.path"/>
+                                <exec executable="protoc">
+                                    <arg value="--java_out=${generated.files.path}"/>
+                                    <arg value="-I${proto.files.path}"/>
+                                    <arg line="${proto.files.path}/*.proto"/>
+                                </exec>
+                            </tasks>
+                            <sourceRoot>${generated.files.path}</sourceRoot>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

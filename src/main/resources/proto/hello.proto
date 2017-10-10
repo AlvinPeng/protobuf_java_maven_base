@@ -1,0 +1,11 @@
+syntax = "proto2";
+
+package test;
+
+option java_package = "com.example.test";
+option java_outer_classname = "Hello";
+
+message HelloMsg{
+    required string name = 1;
+    required int32 id = 2;
+}
